@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
-
+import './EmailScrapView.css';
 
 class EmailScrapView extends Component {
   render() {
@@ -14,14 +14,16 @@ class EmailScrapView extends Component {
             <text values='pradeep'></text>
           </div>
         </div>
-        <div className="row">
-          <div className="col">
+        <div className="row g-3">
+          <div className="col-6 ">
+          <div className='EmailContainer'>
             Website
-            <text></text>
-            <Button>Find Emails</Button>
+            <input className='form-control' type="text" id="fname" name="fname"></input>
+            <Button>Find Email</Button>
+            </div>
           </div>
           <div className="col">
-            2 of 3
+           
           </div>
           
         </div>

@@ -1,0 +1,12 @@
+.EmailContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items:center
+    
+}
+
+#fname{
+    width: 500px;
+    height: 30px;
+    margin: 10px;
+}
