@@ -7,6 +7,12 @@ provider:
   name: aws
   runtime: nodejs14.x
 
+constructs:
+  jobs:
+    type: queue
+    worker:
+      handler: handler.consumer
+
 functions:
   hello:
     handler: handler.hello
@@ -20,6 +26,19 @@ functions:
       - httpApi:
           path: /
           method: post
+  mySQSHandler:
+    handler: worker.consumer
+    events:
+      - sqs: arn:aws:sqs:us-east-2:862836902890:scrapperjobqueue
+
+custom:
+  serverless-offline-sqs-external:
+    apiVersion: '2012-11-05'
+    endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
+    region: us-east-2
+    accessKeyId: AKIA4RZIWJPVASWT36XA
+    secretAccessKey: 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
 
 plugins:
   - serverless-offline
+  - serverless-offline-sqs-external

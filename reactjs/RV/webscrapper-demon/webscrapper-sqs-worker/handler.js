@@ -18,7 +18,7 @@ const producer = async (event) => {
   try {
     await sqs
       .sendMessage({
-        QueueUrl: process.env.QUEUE_URL,
+        QueueUrl: 'https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue/',
         MessageBody: event.body,
         MessageAttributes: {
           AttributeName: {

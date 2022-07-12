@@ -5,6 +5,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "serverless-lift": "^1.1.2"
+    "serverless-lift": "^1.1.2",
+    "serverless-offline": "^8.8.1"
+  },
+  "dependencies": {
+    "serverless-offline-sqs": "^6.0.0"
   }
 }
