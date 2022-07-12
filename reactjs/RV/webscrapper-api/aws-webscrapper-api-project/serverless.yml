@@ -1,0 +1,25 @@
+org: kmpradeep
+app: apiproj
+service: aws-webscrapper-api-project
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  email:
+    handler: email.scrapper
+    events:
+      - httpApi:
+          path: /
+          method: post
+
+plugins:
+  - serverless-offline
