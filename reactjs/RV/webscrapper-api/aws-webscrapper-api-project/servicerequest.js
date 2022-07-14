@@ -1,30 +1,62 @@
 const {service_request} = require('./models');
+const {DraftEmail,Email} = require('./models');
 
-    module.exports.webscrapper = async(req)=>{
-        console.log(req+" In Service");
+    module.exports.webScrapper = async(req)=>{
+        //console.log(req+" In Service");
         try{
-            const response = await service_request.create({
-                url: req,
-                status: "new"
+            const serviceRequest = await service_request.create({
+                url : req,
+                status : "new"
             });
-            return response.id;
+            return serviceRequest.id;
         }
         catch(err){
             return err;
         }
     }
 
-    module.exports.getcurrentstatus = async(req)=>{
-        const id=req;
-        console.log(id)
+    module.exports.getCurrentStatus = async(req)=>{
+        const id = req;
         try{
-            const response = await service_request.findOne({
-                where: {id}
+            const currentStatus = await service_request.findOne({
+                where : {id}
             });
-            console.log(response.status)
-            return response.status;
+            if(currentStatus != null)
+                return currentStatus.status;
+            return "Current Status is unavailable";
         }
         catch(err){
-            return res;
+            return err;
+        }
+    }
+
+    module.exports.getDraftEmail = async(req)=>{
+        const servicerequestid = req;
+        console.log(servicerequestid)
+        try{
+            const emailList = await DraftEmail.findAll({
+                where : {servicerequestid},
+                attributes : ['emailaddress'],
+                raw:true
+            });
+            return emailList.map(email=>email.emailaddress)
+        }
+        catch(err){
+            return err;
+        }
+    }
+
+    module.exports.insertEmail = async(req)=>{
+        try{
+            const email = await Email.create({
+                email : req.email,
+                campgroundid : req.campgroundid,
+                donotemail : req.donotemail,
+                isprimary : req.isprimary
+            });
+            return email.id;
+        }
+        catch(err){
+            return err;
         }
     }

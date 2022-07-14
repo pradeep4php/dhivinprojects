@@ -10,12 +10,12 @@ var builder = new webdriver.Builder().forBrowser('chrome');
 class Webscrapper {
 
     constructor() {
-        this.maxDepth = 2;
-        this.driver = null;
+        this.maxDepth = 1;
+        //this.driver = null;
         this.visitedLinks = [];
         this.emailAddressList = [];
         this.emailExpression = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi
-
+        this.currentDomain = '';
         var chromeOptions = new chrome.Options();
         const defaultChromeFlags = [
             '--headless',
@@ -42,8 +42,12 @@ class Webscrapper {
 
     async getEmailList(webUrl) {
         try {
+           
+            var domainurl = new URL(webUrl);
+            this.currentDomain = domainurl.host;
+
             await this.CrawlWeb(webUrl.toLowerCase(), 0);
-            this.driver.close();
+            //this.driver.close();
             return this.emailAddressList;
         }
         catch (exc) {
@@ -61,6 +65,8 @@ class Webscrapper {
         } catch (_) {
             return false;
         }
+        if( url.host != this.currentDomain )
+            return false;
 
         return url.protocol === "http:" || url.protocol === "https:";
     }
@@ -70,9 +76,9 @@ class Webscrapper {
         if (this.visitedLinks.includes(webUrl) == true)
             return;
         this.visitedLinks.push(webUrl);
-        this.driver = builder.build();
-        var result = await this.driver.get(webUrl);
-        const pageSource = await this.driver.findElement(By.tagName("body")).getText();
+        var driver = builder.build();
+        var result = await driver.get(webUrl);
+        const pageSource = await driver.findElement(By.tagName("body")).getText();
         var mails = pageSource.match(this.emailExpression);
         if (mails != null) {
             for (var mail of mails) {
@@ -80,8 +86,8 @@ class Webscrapper {
                     this.emailAddressList.push(mail);
             }
         }
-        var links = await this.driver.findElements(By.tagName("a"));
-
+        var links = await driver.findElements(By.tagName("a"));
+        var pageLinks = [];
         for (var link of links) {
 
             var href = await link.getAttribute("href");
@@ -94,10 +100,16 @@ class Webscrapper {
                 }
             }
             else if (this.visitedLinks.includes(href) == false && depth < this.maxDepth && this.IsValidHttpUrl(href)) {
-                await this.CrawlWeb(href.toLowerCase(), depth + 1);
+                pageLinks.push(href.toLowerCase());
+                //await this.CrawlWeb(href.toLowerCase(), depth + 1);
             }
         }
-
+        driver.close();
+        //return;
+        for(var pageLink of pageLinks)
+        {
+            await this.CrawlWeb(pageLink, depth + 1);
+        }
         return;
     }
 }

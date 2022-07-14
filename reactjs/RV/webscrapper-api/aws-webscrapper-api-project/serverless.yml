@@ -28,6 +28,12 @@ functions:
       - httpApi:
           path: /status
           method: post
+  emailaddress:
+    handler: email.draftemail
+    events:
+      - httpApi:
+          path: /draftemail
+          method: post
   mySQSHandler:
     handler: worker.consumer
     events:
@@ -38,8 +44,8 @@ custom:
     apiVersion: '2012-11-05'
     endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
     region: us-east-2
-    accessKeyId: ""
-    secretAccessKey: ""
+    accessKeyId: AKIA4RZIWJPVKW2465P6
+    secretAccessKey: 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
 
 plugins:
   - serverless-offline

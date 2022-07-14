@@ -12,12 +12,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //Email.belongsTo(CampGround)
+      Email.belongsTo(models.CampGround,{
+        foreignKey:'id',
+        target_Key:'campgroundid'
+      })
     }
   }
   Email.init({
     email: DataTypes.TEXT,
-    //campgroundid: DataTypes.INTEGER,
+    campgroundid: {
+      type: DataTypes.INTEGER,
+      references : {
+        model:'CampGround',
+        key:'id'
+       }
+    },
     donotemail: DataTypes.INTEGER,
     isprimary: DataTypes.INTEGER
   }, {

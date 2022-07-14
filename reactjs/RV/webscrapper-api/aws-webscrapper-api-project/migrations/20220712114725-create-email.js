@@ -12,7 +12,12 @@ module.exports = {
         type: Sequelize.TEXT
       },
       campgroundid: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:'CampGrounds',
+          key:'id'
+        },
+        onDelete:'CASCADE'
       },
       donotemail: {
         type: Sequelize.INTEGER

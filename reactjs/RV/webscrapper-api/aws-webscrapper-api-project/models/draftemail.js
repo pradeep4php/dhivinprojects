@@ -12,11 +12,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //DraftEmail.belongsTo(service_request)
+      DraftEmail.belongsTo(models.service_request,{
+        foreignKey:'id',
+        target_Key:'servicerequestid'
+      })
     }
   }
   DraftEmail.init({
-    //servicerequestid: DataTypes.INTEGER,
+    servicerequestid: {
+       type: DataTypes.INTEGER,
+       references : {
+        model:'service_request',
+        key:'id'
+       }
+    },
     emailaddress: DataTypes.TEXT
   }, {
     sequelize,

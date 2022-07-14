@@ -9,7 +9,12 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       servicerequestid: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:'service_requests',
+          key:'id'
+        },
+        onDelete:'CASCADE'
       },
       emailaddress: {
         type: Sequelize.TEXT

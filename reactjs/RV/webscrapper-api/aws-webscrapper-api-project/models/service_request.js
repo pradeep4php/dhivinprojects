@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      service_request.hasMany(models.DraftEmail,{
+        foreignKey:'servicerequestid'
+      })
     }
   }
   service_request.init({
