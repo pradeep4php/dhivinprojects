@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      DraftEmail.belongsTo(service_request)
+      //DraftEmail.belongsTo(service_request)
     }
   }
   DraftEmail.init({
