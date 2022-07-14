@@ -3,7 +3,8 @@
     "serverless-offline": "^8.8.1"
   },
   "scripts": {
-    "debug": "SET SLS_DEBUG=* && node --inspect %USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\serverless\\bin\\serverless offline -s dev"
+    "debug": "SET SLS_DEBUG=* && node --inspect %USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\serverless\\bin\\serverless offline -s dev",
+    "deploy": "serverless deploy --region us-east-2"
   },
   
   "dependencies": {

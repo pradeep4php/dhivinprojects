@@ -7,35 +7,43 @@ provider:
   name: aws
   runtime: nodejs14.x
 
-
+	
+layers:
+  webdriver:
+    name: ${sls:stage}-layerName # optional, Deployed Lambda layer name
+    description: Description of what the lambda layer does # optional, Description to publish to AWS
+    compatibleRuntimes: # optional, a list of runtimes this layer is compatible with
+      - nodejs14.x
+    compatibleArchitectures: # optional, a list of architectures this layer is compatible with
+      - x86_64
+      - arm64
+    package:
+      artifact: layerSource.zip
 
 functions:
-  hello:
-    handler: handler.hello
-    events:
-      - httpApi:
-          path: /
-          method: get
+  
   email:
-    handler: email.scrapper
+    handler: handler.scrapper
     events:
       - httpApi:
           path: /
           method: post
   status:
-    handler: email.status
+    handler: handler.status
     events:
       - httpApi:
           path: /status
           method: post
   emailaddress:
-    handler: email.draftemail
+    handler: handler.draftemail
     events:
       - httpApi:
           path: /draftemail
           method: post
-  mySQSHandler:
+  webcrawlerjob:
     handler: worker.consumer
+    
+
     events:
       - sqs: arn:aws:sqs:us-east-2:862836902890:scrapperjobqueue
 
@@ -44,8 +52,15 @@ custom:
     apiVersion: '2012-11-05'
     endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
     region: us-east-2
-    accessKeyId: AKIA4RZIWJPVKW2465P6
-    secretAccessKey: 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
+    accessKeyId: 
+    secretAccessKey: 
+package:
+  patterns:
+    - '!layerSource.zip'
+    - '!.vscode/**'
+    - '!.serverless/**'
+    - '!.vs/**'
+    - '!migrations/**'
 
 plugins:
   - serverless-offline
