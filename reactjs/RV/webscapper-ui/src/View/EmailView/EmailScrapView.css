@@ -1,4 +1,4 @@
-.EmailContainer {
+.EmailContainer,.Result {
     display: flex;
     flex-wrap: wrap;
     align-items:center
@@ -9,4 +9,59 @@
     width: 500px;
     height: 30px;
     margin: 10px;
+}
+
+/* styling search bar */
+.search input[type=text]{
+    width:300px;
+    height:25px;
+    border-radius:25px;
+}
+     
+.search{
+    float:right;
+    margin:7px;
+}
+     
+.buttonSearch{
+    background-color: #0074D9;
+    color: #f2f2f2;
+    float: center;
+    padding: 5px 10px;
+    margin-right: 16px;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+}
+
+#searchicon {
+    font-size: 18px;
+}
+
+
+.Result{
+    padding: 30px;
+    font-size: 20px;
+}
+
+.container {
+    padding: 10px;
+}
+
+#currentEmail,#newEmail,#validateEmail {
+    background-color: ghostwhite;
+    border: 2px solid black;
+    border-radius: 2px;
+    padding: 10px;
+    font-size: 15px;
+}
+
+#emailRow {
+    padding-top: 5px;
+}
+
+#cols{
+    background-color: ghostwhite;
+    border: 2px solid black;
+    border-radius: 2px;
 }

@@ -40,8 +40,7 @@ module.exports.scrapper = async (event) => {
   };
 };
 module.exports.status = async (event) => {
-  const reqid=JSON.parse(event.body);
-  const id=reqid.servicerequestid;
+  const id=event.pathParameters.id;
   console.log(id);
   const currentstatus = await request.getCurrentStatus(id);
   console.log(currentstatus);
@@ -61,8 +60,7 @@ module.exports.status = async (event) => {
 };
 
 module.exports.draftemail = async (event) => {
-  const reqid=JSON.parse(event.body);
-  const id=reqid.servicerequestid;
+  const id=event.pathParameters.id;
   console.log(id);
   const draftEmailList = await request.getDraftEmail(id);
   console.log(draftEmailList)
