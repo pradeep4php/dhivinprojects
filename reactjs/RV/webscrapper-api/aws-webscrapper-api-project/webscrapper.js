@@ -4,7 +4,9 @@ var webdriver = require('selenium-webdriver');
 const { Browser, By, Key, until } = require('selenium-webdriver');
 var webdriver = require('selenium-webdriver');
 var chrome = require('selenium-webdriver/chrome');
-var builder = new webdriver.Builder().forBrowser('chrome');
+let serviceBuilder = new chrome.ServiceBuilder('/var/task/lib/chromedriver');
+
+var builder = new webdriver.Builder().forBrowser('chrome').setChromeService(serviceBuilder);
 
 
 class Webscrapper {
@@ -27,22 +29,32 @@ class Webscrapper {
             '--enable-logging',
             '--log-level=0',
             '--v=99',
-            
+            '--disable-dev-shm-usage',
             '--data-path=/tmp/data-path',
             '--ignore-certificate-errors',
             '--homedir=/tmp',
             '--disk-cache-dir=/tmp/cache-dir'
         ];
 
-        //chromeOptions.setChromeBinaryPath("/var/task/lib/chrome");
-        chromeOptions.addArguments(defaultChromeFlags);
+        chromeOptions.addArguments("start-maximized"); // open Browser in maximized mode
+        chromeOptions.addArguments("disable-infobars"); // disabling infobars
+        chromeOptions.addArguments("--disable-extensions"); // disabling extensions
+        chromeOptions.addArguments("--disable-gpu"); // applicable to windows os only
+        chromeOptions.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+        chromeOptions.addArguments("--no-sandbox"); // Bypass OS security model
+        chromeOptions.addArguments("--remote-debugging-port=0");
 
-        builder.setChromeOptions(chromeOptions);
+        chromeOptions.setChromeBinaryPath("/var/task/lib");
+        //chromeOptions.addArguments(defaultChromeFlags);
+
+        //builder.setChromeOptions(chromeOptions);
+        
+
     }
 
     async getEmailList(webUrl) {
         try {
-           
+
             var domainurl = new URL(webUrl);
             this.currentDomain = domainurl.host;
 
@@ -65,51 +77,28 @@ class Webscrapper {
         } catch (_) {
             return false;
         }
-        if( url.host != this.currentDomain )
+        if (url.host != this.currentDomain)
             return false;
 
         return url.protocol === "http:" || url.protocol === "https:";
     }
 
     async CrawlWeb(webUrl, depth) {
-        console.log(`Crawling url ${webUrl}`)
-        if (this.visitedLinks.includes(webUrl) == true)
-            return;
-        this.visitedLinks.push(webUrl);
-        var driver = builder.build();
-        var result = await driver.get(webUrl);
-        const pageSource = await driver.findElement(By.tagName("body")).getText();
-        var mails = pageSource.match(this.emailExpression);
-        if (mails != null) {
-            for (var mail of mails) {
-                if (this.emailAddressList.includes(mail) == false)
-                    this.emailAddressList.push(mail);
-            }
-        }
-        var links = await driver.findElements(By.tagName("a"));
-        var pageLinks = [];
-        for (var link of links) {
+        try {
+            console.log(`Crawling url ${webUrl}`)
+            
+            var driver = builder.build();
+            var d = await driver.get("http://google.com")
+            const pageSource = await driver.findElement(By.tagName("body")).getText();
+            console.log(pageSource);
 
-            var href = await link.getAttribute("href");
-            if (href == null || href == '')
-                continue;
-            if (href.includes("mailto") == true) {
-                const mailCheck = href.split("mailto:");
-                if (this.emailAddressList.includes(mailCheck[0]) == false) {
-                    this.emailAddressList.push(mailCheck[0]);
-                }
-            }
-            else if (this.visitedLinks.includes(href) == false && depth < this.maxDepth && this.IsValidHttpUrl(href)) {
-                pageLinks.push(href.toLowerCase());
-                //await this.CrawlWeb(href.toLowerCase(), depth + 1);
-            }
+            driver.close();
         }
-        driver.close();
-        //return;
-        for(var pageLink of pageLinks)
+        catch(exc)
         {
-            await this.CrawlWeb(pageLink, depth + 1);
+            console.log(exc.message);
         }
+        
         return;
     }
 }

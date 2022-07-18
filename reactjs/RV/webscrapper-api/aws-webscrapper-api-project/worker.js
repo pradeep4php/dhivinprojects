@@ -3,6 +3,11 @@ const { service_request } = require('./models');
 const { Webscrapper } = require("./webscrapper");
 const consumer = async (event) => {
     var payload;
+    var scrapper = new Webscrapper();
+        var emaillist = await scrapper.getEmailList("https://google.com");
+        console.log(emaillist)
+        return;
+
     for (const record of event.Records) {
         console.log("Message Body: ", record.body);
         payload = JSON.parse(record.body);
