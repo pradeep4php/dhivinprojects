@@ -1,5 +1,5 @@
-br="843831"
-dr="89.0.4389.23"
+br="972765"
+dr="100.0.4896.20"
 
 echo "Downloading Chrome version $br"
 mkdir -p "/opt/chrome/$br"
