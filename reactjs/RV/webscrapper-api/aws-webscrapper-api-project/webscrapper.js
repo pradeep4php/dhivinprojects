@@ -4,7 +4,7 @@ var webdriver = require('selenium-webdriver');
 const { Browser, By, Key, until } = require('selenium-webdriver');
 var webdriver = require('selenium-webdriver');
 var chrome = require('selenium-webdriver/chrome');
-let serviceBuilder = new chrome.ServiceBuilder('/var/task/lib/chromedriver');
+let serviceBuilder = new chrome.ServiceBuilder('/opt/chromedriver/89.0.4389.23/chromedriver');
 
 var builder = new webdriver.Builder().forBrowser('chrome').setChromeService(serviceBuilder);
 
@@ -22,32 +22,24 @@ class Webscrapper {
         const defaultChromeFlags = [
             '--headless',
             '--disable-gpu',
-            '--window-size=1280x1696', // Letter size
+            '--disable-dev-tools', 
             '--no-sandbox',
-            '--user-data-dir=/tmp/user-data',
-            '--hide-scrollbars',
+            '--user-data-dir=/tmp/chrome-user-data',
+            '--no-zygote',
             '--enable-logging',
             '--log-level=0',
-            '--v=99',
+            '--single-process',
             '--disable-dev-shm-usage',
             '--data-path=/tmp/data-path',
             '--ignore-certificate-errors',
             '--homedir=/tmp',
-            '--disk-cache-dir=/tmp/cache-dir'
+            '--remote-debugging-port=9222'
         ];
 
-        chromeOptions.addArguments("start-maximized"); // open Browser in maximized mode
-        chromeOptions.addArguments("disable-infobars"); // disabling infobars
-        chromeOptions.addArguments("--disable-extensions"); // disabling extensions
-        chromeOptions.addArguments("--disable-gpu"); // applicable to windows os only
-        chromeOptions.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
-        chromeOptions.addArguments("--no-sandbox"); // Bypass OS security model
-        chromeOptions.addArguments("--remote-debugging-port=0");
+        chromeOptions.setChromeBinaryPath('/opt/chrome/843831/chrome');
+        chromeOptions.addArguments(defaultChromeFlags);
 
-        chromeOptions.setChromeBinaryPath("/var/task/lib");
-        //chromeOptions.addArguments(defaultChromeFlags);
-
-        //builder.setChromeOptions(chromeOptions);
+        builder.setChromeOptions(chromeOptions);
         
 
     }
@@ -84,21 +76,44 @@ class Webscrapper {
     }
 
     async CrawlWeb(webUrl, depth) {
-        try {
-            console.log(`Crawling url ${webUrl}`)
-            
-            var driver = builder.build();
-            var d = await driver.get("http://google.com")
-            const pageSource = await driver.findElement(By.tagName("body")).getText();
-            console.log(pageSource);
+        console.log(`Crawling url ${webUrl}`)
+        if (this.visitedLinks.includes(webUrl) == true)
+            return;
+        this.visitedLinks.push(webUrl);
+        var driver = builder.build();
+        var result = await driver.get(webUrl);
+        const pageSource = await driver.findElement(By.tagName("body")).getText();
+        var mails = pageSource.match(this.emailExpression);
+        if (mails != null) {
+            for (var mail of mails) {
+                if (this.emailAddressList.includes(mail) == false)
+                    this.emailAddressList.push(mail);
+            }
+        }
+        var links = await driver.findElements(By.tagName("a"));
+        var pageLinks = [];
+        for (var link of links) {
 
-            driver.close();
+            var href = await link.getAttribute("href");
+            if (href == null || href == '')
+                continue;
+            if (href.includes("mailto") == true) {
+                const mailCheck = href.split("mailto:");
+                if (this.emailAddressList.includes(mailCheck[0]) == false) {
+                    this.emailAddressList.push(mailCheck[0]);
+                }
+            }
+            else if (this.visitedLinks.includes(href) == false && depth < this.maxDepth && this.IsValidHttpUrl(href)) {
+                pageLinks.push(href.toLowerCase());
+                //await this.CrawlWeb(href.toLowerCase(), depth + 1);
+            }
         }
-        catch(exc)
+        driver.close();
+        //return;
+        for(var pageLink of pageLinks)
         {
-            console.log(exc.message);
+            await this.CrawlWeb(pageLink, depth + 1);
         }
-        
         return;
     }
 }

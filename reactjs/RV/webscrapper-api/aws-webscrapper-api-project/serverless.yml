@@ -47,16 +47,14 @@ functions:
      image:
       name: appimage
      events:
-      - httpApi:
-          path: /consume
-          method: get
+      - sqs: arn:aws:sqs:us-east-2:862836902890:scrapperjobqueue
 
 custom:
   serverless-offline-sqs-external:
     apiVersion: '2012-11-05'
     endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
     region: us-east-2
-
+    
 
 package:
   patterns:
