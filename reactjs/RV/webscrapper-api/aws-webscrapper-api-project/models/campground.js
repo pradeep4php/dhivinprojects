@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      CampGround.hasMany(models.CampGround,{
+      CampGround.hasMany(models.Email,{
         foreignKey:'campgroundid'
       })
     }

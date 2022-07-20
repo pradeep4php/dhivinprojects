@@ -1,5 +1,7 @@
 const {service_request} = require('./models');
-const {DraftEmail,Email} = require('./models');
+const {DraftEmail,Email,CampGround} = require('./models');
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
     module.exports.webScrapper = async(req)=>{
         //console.log(req+" In Service");
@@ -39,22 +41,53 @@ const {DraftEmail,Email} = require('./models');
                 attributes : ['emailaddress'],
                 raw:true
             });
-            return emailList.map(email=>email.emailaddress)
+            return emailList.map(email=>email.emailaddress);
         }
         catch(err){
             return err;
         }
     }
 
-    module.exports.insertEmail = async(req)=>{
+    
+    module.exports.getCampGroundDetails = async(req)=>{
+        const campGroundName = req;
+        console.log(campGroundName)
         try{
-            const email = await Email.create({
-                email : req.email,
-                campgroundid : req.campgroundid,
-                donotemail : req.donotemail,
-                isprimary : req.isprimary
+            const campGroundDetails = await CampGround.findAll({
+                where : {
+                    name: {
+                        [Op.like]:`%${campGroundName}%`
+                    }
+                },
+                raw:true
             });
-            return email.id;
+            return campGroundDetails;
+        }
+        catch(err){
+            return err;
+        }
+    }
+
+    module.exports.insertEmails = async(req)=>{
+        try{
+            const emails=req;
+            const emailAdded = await Email.bulkCreate(emails);
+            return emailAdded;
+        }
+        catch(err){
+            return err;
+        }
+    }
+
+    module.exports.getEmails = async(req)=>{
+        const campgroundid = req;
+        try{
+            const emailList = await Email.findAll({
+                where : {campgroundid},
+                attributes : ['email'],
+                raw:true
+            });
+            return emailList.map(mail=>mail.email);
         }
         catch(err){
             return err;

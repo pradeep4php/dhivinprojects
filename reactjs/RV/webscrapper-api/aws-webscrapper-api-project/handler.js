@@ -30,9 +30,9 @@ module.exports.scrapper = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: {
-          "ServiceRequestID": id
-        }
+        
+          "serviceRequestID": id
+        
       },
       null,
       2
@@ -48,10 +48,10 @@ module.exports.status = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: {
-          "ServiceRequestID" : id,
-          "ServiceRequestID Status" : currentstatus
-        }
+       
+          "serviceRequestID" : id,
+          "status" : currentstatus
+        
       },
       null,
       2
@@ -68,9 +68,67 @@ module.exports.draftemail = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
+        
+          "serviceRequestID" : id,
+          "emaillist" : draftEmailList
+        
+      },
+      null,
+      2
+    ),
+  };
+};
+
+
+module.exports.campground = async (event) => {
+  const name=event.pathParameters.name;
+  console.log(name);
+  const campGrounds = await request.getCampGroundDetails(name);
+  console.log(campGrounds)
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        
+          "campGrounds" : campGrounds
+        
+      },
+      null,
+      2
+    ),
+  };
+};
+
+module.exports.addemails = async (event) => {
+  const emailsToAdd=JSON.parse(event.body);
+  console.log(emailsToAdd);
+  const addedEmailIDs = await request.insertEmails(emailsToAdd);
+  console.log(addedEmailIDs)
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
         message: {
-          "ServiceRequestID" : id,
-          "Email IDs" : draftEmailList
+          "Emails Added" : addedEmailIDs
+        }
+      },
+      null,
+      2
+    ),
+  };
+};
+
+module.exports.getemails = async (event) => {
+  const emailID=event.pathParameters.id;
+  console.log(emailID);
+  const EmailIDs = await request.getEmails(emailID);
+  console.log(emailID)
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+        message: {
+          "Emails" : EmailIDs
         }
       },
       null,

@@ -43,9 +43,26 @@ functions:
       - httpApi:
           path: /draftemail/{id}
           method: get
+  campground:
+    handler: handler.campground
+    events:
+      - httpApi:
+          path: /campground/{name}
+          method: get
+  addemails:
+    handler: handler.addemails
+    events:
+      - httpApi:
+          path: /email
+          method: post
+  getemails:
+    handler: handler.getemails
+    events:
+      - httpApi:
+          path: /email/{id}
+          method: get  
   webcrawlerjob:
-     image:
-      name: appimage
+     handler: worker.consumer
      events:
       - sqs: arn:aws:sqs:us-east-2:862836902890:scrapperjobqueue
 
@@ -54,6 +71,7 @@ custom:
     apiVersion: '2012-11-05'
     endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
     region: us-east-2
+    
     
 
 package:
