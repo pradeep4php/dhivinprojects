@@ -12,7 +12,7 @@ var builder = new webdriver.Builder().forBrowser('chrome');//.setChromeService(s
 class Webscrapper {
 
     constructor() {
-        this.maxDepth = 5;
+        this.maxDepth = 1;
         //this.driver = null;
         this.visitedLinks = [];
         this.emailAddressList = [];

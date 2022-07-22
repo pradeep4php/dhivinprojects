@@ -60,7 +60,19 @@ functions:
     events:
       - httpApi:
           path: /email/{id}
+          method: get
+  deleteemail:
+    handler: handler.deleteemail
+    events:
+      - httpApi:
+          path: /email/{campid}/{email}
           method: get  
+  existingEmail:
+    handler: handler.existingEmail 
+    events:
+      - httpApi:
+          path: /existemail/{id}
+          method: get
   webcrawlerjob:
      handler: worker.consumer
      events:

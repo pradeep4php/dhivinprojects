@@ -89,9 +89,7 @@ module.exports.campground = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        
-          "campGrounds" : campGrounds
-        
+        "campGrounds" : campGrounds
       },
       null,
       2
@@ -108,9 +106,7 @@ module.exports.addemails = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: {
-          "Emails Added" : addedEmailIDs
-        }
+        "emailsAdded" : addedEmailIDs
       },
       null,
       2
@@ -127,12 +123,46 @@ module.exports.getemails = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: {
-          "Emails" : EmailIDs
-        }
+          "emailList" : EmailIDs
       },
       null,
       2
     ),
   };
 };
+
+module.exports.deleteemail = async (event) => {
+  const campID=event.pathParameters.campid;
+  const emailAddress=event.pathParameters.email;
+  console.log(`${campID} ${emailAddress}`);
+  const deletedMail = await request.deleteEmail(campID,emailAddress);
+  console.log(deletedMail)
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+          "deletedEmailCount" : deletedMail
+      },
+      null,
+      2
+    ),
+  };
+};
+
+module.exports.existingEmail = async (event) => {
+  const serviceRequestID=event.pathParameters.id;
+  //console.log(`${campID} ${emailAddress}`);
+  const existingEmailID = await request.existingEmail(serviceRequestID);
+  console.log(existingEmailID)
+  return {
+    statusCode: 200,
+    body: JSON.stringify(
+      {
+          "existingEmail" : existingEmailID
+      },
+      null,
+      2
+    ),
+  };
+};
+

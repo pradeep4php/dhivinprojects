@@ -17,3 +17,8 @@ export interface DraftEmailResponse {
     serviceRequestID : number,
     emaillist: string[]
 }
+
+export interface ExistingEmailResponse {
+    
+    existingEmail: string[]
+}

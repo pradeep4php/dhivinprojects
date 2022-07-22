@@ -1,9 +1,18 @@
 .EmailContainer,.Result {
     display: flex;
     flex-wrap: wrap;
-    align-items:center
+    align-items:center;
+    font:Verdana;
     
 }
+
+h2 {
+    margin: 10px;
+}
+
+div #emailRow {
+    word-wrap: break-word;
+  }
 
 #fname{
     width: 500px;

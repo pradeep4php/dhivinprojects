@@ -93,3 +93,46 @@ const Op = Sequelize.Op;
             return err;
         }
     }
+
+    module.exports.deleteEmail = async(campgroundid,email)=>{
+        try{
+            const emailDeleted = await Email.destroy({
+                where : {campgroundid,email},
+                raw:true
+            })
+            return emailDeleted;
+        }
+        catch(err){
+            return err;
+        }
+    }
+
+    module.exports.existingEmail = async(id)=>{
+        try{
+            const getUrl = await service_request.findOne({
+                where : {id},
+                attributes : ['url'],
+                raw:true
+            });
+            if(getUrl == null)
+                return "ServiceRequestID doesn't exist";
+            const website = getUrl.url;
+            const campGround = await CampGround.findOne({
+                where : {website},
+                attributes : ['id'],
+                raw:true
+            });
+            if(campGround == null)
+                return "CampGroundID doesn't exist for the given servicerequestID"
+            const campgroundid = campGround.id;
+            const emailList = await Email.findAll({
+                where : {campgroundid},
+                attributes : ['email'],
+                raw:true
+            });
+            return emailList.map(mail=>mail.email);
+        }
+        catch(err){
+            return err;
+        }
+    }
