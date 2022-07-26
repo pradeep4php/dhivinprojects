@@ -31,30 +31,36 @@ functions:
       - httpApi:
           path: /
           method: post
+          cors: true # <-- CORS!
   status:
     handler: handler.status
     events:
       - httpApi:
           path: /status/{id}
           method: get
+          cors: true # <-- CORS!
   emailaddress:
     handler: handler.draftemail
     events:
       - httpApi:
           path: /draftemail/{id}
           method: get
+          cors: true # <-- CORS!
   campground:
     handler: handler.campground
     events:
       - httpApi:
           path: /campground/{name}
           method: get
+          cors: true # <-- CORS!
   addemails:
     handler: handler.addemails
     events:
       - httpApi:
           path: /email
           method: post
+          cors: true # <-- CORS!
+
   getemails:
     handler: handler.getemails
     events:
@@ -73,17 +79,8 @@ functions:
       - httpApi:
           path: /existemail/{id}
           method: get
-  webcrawlerjob:
-     handler: worker.consumer
-     events:
-      - sqs: arn:aws:sqs:us-east-2:862836902890:scrapperjobqueue
+  
 
-custom:
-  serverless-offline-sqs-external:
-    apiVersion: '2012-11-05'
-    endpoint: https://sqs.us-east-2.amazonaws.com/862836902890/scrapperjobqueue
-    region: us-east-2
-    
     
 
 package:

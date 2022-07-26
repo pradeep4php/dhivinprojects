@@ -6,16 +6,18 @@
     "debug": "SET SLS_DEBUG=* && node --inspect %USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\serverless\\bin\\serverless offline -s dev",
     "deploy": "serverless deploy --region us-east-2"
   },
-  
   "dependencies": {
     "-": "^0.0.1",
+    "aws-cloudwatch-log": "^0.1.2",
     "aws-sdk": "^2.1173.0",
+    "dotenv": "^16.0.1",
     "g": "^2.0.1",
     "mysql2": "^2.3.3",
     "selenium-webdriver": "^4.3.1",
     "sequelize": "^6.21.3",
     "sequelize-cli": "^6.4.1",
     "serverless-offline-sqs": "^6.0.0",
-    "serverless-offline-sqs-external": "^1.0.6"
+    "serverless-offline-sqs-external": "^1.0.6",
+    "sqs-consumer": "^5.7.0"
   }
 }

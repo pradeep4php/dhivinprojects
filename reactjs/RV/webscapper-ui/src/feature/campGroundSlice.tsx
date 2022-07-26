@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import CrawlerRequest from "../model/requestPayload"
+import {CrawlerRequest,  CampGroundEmailRequest } from "../model/requestPayload"
 import { CampGroundSearchResponse } from "../model/responsePayload"
-import { invokeSearch } from "../services/crawlerService"
+import { invokeAddEmail, invokeSearch } from "../services/crawlerService"
 
 
 export interface CamGroundState {
@@ -33,6 +33,22 @@ export interface CamGroundState {
     async (payload: string, thunkAPI) => {
         const response = await invokeSearch(payload);
         return response.campGrounds.length > 0 ? response.campGrounds[0] : {};
+    }
+  )
+
+  export const addEmailAddress = createAsyncThunk<
+  // Return type of the payload creator
+  string,
+  // First argument to the payload creator
+  CampGroundEmailRequest[],
+  {
+   
+  }
+>(
+    'campGround/addEmail',
+    async (payload: CampGroundEmailRequest[], thunkAPI) => {
+        const response = await invokeAddEmail(payload);
+        return response;
     }
   )
   

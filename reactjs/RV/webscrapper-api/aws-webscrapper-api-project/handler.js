@@ -28,6 +28,10 @@ module.exports.scrapper = async (event) => {
   //console.log(id);
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
         
@@ -46,6 +50,10 @@ module.exports.status = async (event) => {
   console.log(currentstatus);
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
        
@@ -66,6 +74,10 @@ module.exports.draftemail = async (event) => {
   console.log(draftEmailList)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
         
@@ -87,6 +99,10 @@ module.exports.campground = async (event) => {
   console.log(campGrounds)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
         "campGrounds" : campGrounds
@@ -104,6 +120,10 @@ module.exports.addemails = async (event) => {
   console.log(addedEmailIDs)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
         "emailsAdded" : addedEmailIDs
@@ -121,6 +141,10 @@ module.exports.getemails = async (event) => {
   console.log(emailID)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
           "emailList" : EmailIDs
@@ -139,6 +163,10 @@ module.exports.deleteemail = async (event) => {
   console.log(deletedMail)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
           "deletedEmailCount" : deletedMail
@@ -156,6 +184,10 @@ module.exports.existingEmail = async (event) => {
   console.log(existingEmailID)
   return {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(
       {
           "existingEmail" : existingEmailID

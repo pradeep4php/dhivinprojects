@@ -6,10 +6,10 @@ import Button from '@mui/material/Button';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { startWebCrawler, getStatus, currentServiceId, progressStatus, campGroundEmails, getDraftEmail, reset } from '../../feature/draftEmailSlice';
-import { searchCampGround, currentCampGround } from '../../feature/campGroundSlice';
-import {getExistingEmail,existingCampgroundEmail} from '../../feature/emailSlice'
+import { searchCampGround, currentCampGround, addEmailAddress } from '../../feature/campGroundSlice';
+import { getExistingEmail, existingCampgroundEmail } from '../../feature/emailSlice'
 import TextField from '@mui/material/TextField';
-
+import { CampGroundEmailRequest } from "../../model/requestPayload"
 import './EmailScrapView.css';
 import ClockLoader from "react-spinners/ClockLoader";
 import SearchAppBar from '../../SearchAppBar';
@@ -22,6 +22,8 @@ import { Typography, Switch, Box, Card, Divider, Chip, IconButton } from '@mui/m
 export default function EmailScrapView() {
   const dispatch = useDispatch();
   const [searchItem, setSearchItem] = useState();
+  const [urlValid, setUrlValid] = useState(true);
+  const [urlErrorText, setUrlErrorText] = useState("");
   const [webUrl, setWebUrl] = useState("");
   const [currentDomain, setCurrentDomain] = useState("");
   const [color, setColor] = useState("#ffffff");
@@ -46,10 +48,18 @@ export default function EmailScrapView() {
     setNewEmails([]);
     setValidateEmails([]);
 
-    if(webUrl === '')
+    if (webUrl === '')
       return;
-    setCurrentDomain((new URL(webUrl)));
-
+    try {
+      setCurrentDomain((new URL(webUrl)));
+      setUrlValid(true);
+      setUrlErrorText('');
+    }
+    catch (e) {
+      setUrlValid(false);
+      setUrlErrorText("Invalid Url");
+      return;
+    }
     dispatch(startWebCrawler({
       url: webUrl
     }));
@@ -58,7 +68,7 @@ export default function EmailScrapView() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
+
 
     dispatch(searchCampGround(searchItem));
     console.log('You clicked submit.');
@@ -79,14 +89,16 @@ export default function EmailScrapView() {
 
 
   useEffect(() => {
-    
+
 
     let domainEmail = [];
     let nonDomainEmail = [];
-    for( var e of currentEmailList)
-    {
+    if(currentDomain == "")
+      return;
+    let rootHost = currentDomain.hostname.replace("www.","");
+    for (var e of currentEmailList) {
       const address = e.split('@').pop();
-      if( currentDomain.hostname === address )
+      if (rootHost === address)
         domainEmail.push(e);
       else
         nonDomainEmail.push(e);
@@ -94,7 +106,7 @@ export default function EmailScrapView() {
     }
     setNewEmails([...domainEmail]);
     setValidateEmails([...nonDomainEmail])
-  }, [currentEmailList,webUrl])
+  }, [currentEmailList, webUrl])
 
   const isSpinning = () => {
     return !(status === "" || status === "complete");
@@ -107,27 +119,74 @@ export default function EmailScrapView() {
 
   }
 
+  const onAddCampaignEmail = () => {
+    let emailReq = [];
+
+    for (let e of newEmails) {
+      if (currentEmailList.indexOf(e) == -1)
+        continue;
+      let email = {
+        email: e,
+        isprimary: 1,
+        donotemail: 1,
+        campgroundid: campGround.id,
+      };
+      emailReq.push(email);
+
+    }
+    if (emailReq.length > 0)
+      dispatch(addEmailAddress(emailReq));
+
+  }
+
   const startSearch = () => {
     clearTimeout(searchHandle);
     dispatch(searchCampGround(searchItem));
   }
 
+  const onSelectEmail = (email) => {
+    var emailTempList = [...validateEmails];
+    var removeIndex = emailTempList.indexOf(email);
+    emailTempList.splice(removeIndex, 1);
+    setValidateEmails(emailTempList);
+
+    setNewEmails([...newEmails, email]);
+
+  }
+
+  const onDeleteValidateEmail = (email) => {
+    var emailTempList = [...validateEmails];
+    var removeIndex = emailTempList.indexOf(email);
+    emailTempList.splice(removeIndex, 1);
+    setValidateEmails(emailTempList);
+
+  }
+
+  const onDeleteNewEmail = (email) => {
+    var emailTempList = [...newEmails];
+    var removeIndex = emailTempList.indexOf(email);
+    emailTempList.splice(removeIndex, 1);
+    setNewEmails(emailTempList);
+
+  }
+
 
   return <>
     <SearchAppBar onChange={onSearchTextChange}></SearchAppBar>
-    <ClockLoader loading={isSpinning()} />
-    <div className="row">
-      
-        <div className="col-sm">
-          <h2>Get Email</h2>
-        </div>
+    <ClockLoader id="spinner" loading={isSpinning()} />
 
-     
+    <div className="row">
+
+      <div className="col-sm">
+        <h2>Get Email</h2>
+      </div>
+
+
       <div className="row g-3">
         <div className="col-6 ">
           <div className='EmailContainer'>
 
-            <TextField sx={{ width: '50ch', marginLeft:'10px', marginRight:'20px' }} id="outlined-basic" label="Url" variant="outlined" value={webUrl} onChange={(e) => setWebUrl(e.target.value)} />
+            <TextField error={!urlValid} helperText={urlErrorText} sx={{ width: '50ch', marginLeft: '10px', marginRight: '20px' }} id="outlined-basic" label="Url" variant="outlined" value={webUrl} onChange={(e) => setWebUrl(e.target.value)} />
             <Button variant="contained" onClick={handleClick} disabled={webUrl.length == 0}>Find Email</Button>
           </div>
         </div>
@@ -135,34 +194,34 @@ export default function EmailScrapView() {
           <div className="search">
 
             {campGround.id != 0 && <>
-            <Card>
-              <Box sx={{ p: 2, display: 'flex' }}>
-                <Avatar variant="rounded" src="https://img.icons8.com/ios-filled/50/000000/rv-campground.png" />
-                <Stack spacing={0.5}>
-                  <Typography fontWeight={700}>{campGround.name}</Typography>
+              <Card>
+                <Box sx={{ p: 2, display: 'flex' }}>
+                  <Avatar variant="rounded" src="https://img.icons8.com/ios-filled/50/000000/rv-campground.png" />
+                  <Stack spacing={0.5}>
+                    <Typography fontWeight={700}>{campGround.name}</Typography>
 
-                  <Typography variant="body2" color="text.secondary">
-                    <img src="https://img.icons8.com/plumpy/24/1A1A1A/marker.png" />
-                    Scranton, PA
-                  </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <img src="https://img.icons8.com/plumpy/24/1A1A1A/marker.png" />
+                      Scranton, PA
+                    </Typography>
+                  </Stack>
+
+                </Box>
+                <Divider />
+
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ px: 2, py: 1, bgcolor: 'background.default' }}
+                >
+                  <Button onClick={onAddCampaignEmail} variant="contained" >Assign Email</Button>
                 </Stack>
 
-              </Box>
-              <Divider />
 
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                sx={{ px: 2, py: 1, bgcolor: 'background.default' }}
-              >
-                <Button variant="contained" >Assign Email</Button>
-              </Stack>
+              </Card>
 
 
-            </Card>
-
-           
             </>}
           </div>
         </div>
@@ -182,7 +241,7 @@ export default function EmailScrapView() {
           {
             existingEmail && existingEmail.map(function (key) {
               return <div className="row" id="emailRow"><div className='col-md-10'>{key} </div><div className='col-md-1 '>
-                <a href=''><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
+                <a><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
               </div></div>
             })
           }
@@ -193,7 +252,7 @@ export default function EmailScrapView() {
           {
             newEmails && newEmails.map(function (key) {
               return <div className="row" id="emailRow"><div className='col-md-10'>{key} </div><div className='col-md-1 '>
-                <a href=''><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
+                <a onClick={() => onDeleteNewEmail(key)}><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
               </div></div>
             })
           }
@@ -205,15 +264,15 @@ export default function EmailScrapView() {
           {
             validateEmails && validateEmails.map(function (key) {
               return <div className="row" id="emailRow"><div className='col-md-8'>{key} </div><div className='col-md-1 '>
-                <a href=''><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
+                <a onClick={() => onSelectEmail(key)}><img src="https://img.icons8.com/ios-glyphs/30/000000/add--v1.png" /></a>
               </div>
-              <div className='col-md-1'>
-              <a href=''><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
-            </div>
+                <div className='col-md-1'>
+                  <a onClick={() => onDeleteValidateEmail(key)}><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
+                </div>
               </div>
             })
           }
-         
+
         </div>
 
       </div>

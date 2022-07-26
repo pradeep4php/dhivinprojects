@@ -4,9 +4,16 @@ var webdriver = require('selenium-webdriver');
 const { Browser, By, Key, until } = require('selenium-webdriver');
 var webdriver = require('selenium-webdriver');
 var chrome = require('selenium-webdriver/chrome');
-//let serviceBuilder = new chrome.ServiceBuilder('/opt/chromedriver/100.0.4896.20/chromedriver');
+let serviceBuilder = new chrome.ServiceBuilder('/opt/chromedriver/100.0.4896.20/chromedriver');
 
-var builder = new webdriver.Builder().forBrowser('chrome');//.setChromeService(serviceBuilder);
+var builder = new webdriver.Builder().forBrowser('chrome').setChromeService(serviceBuilder);
+const { createLogStream , Logger } = require('aws-cloudwatch-log');
+
+const AWS = require('aws-sdk');
+require('dotenv').config()
+
+
+
 
 
 class Webscrapper {
@@ -18,6 +25,8 @@ class Webscrapper {
         this.emailAddressList = [];
         this.emailExpression = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi
         this.currentDomain = '';
+        this.logStreamName = "";
+        this.logger = null;
         var chromeOptions = new chrome.Options();
         const defaultChromeFlags = [
             '--headless',
@@ -39,7 +48,7 @@ class Webscrapper {
         //chromeOptions.addArguments("--user-data-dir=/tmp/chrome-user-data")
         //chromeOptions.addArguments("--remote-debugging-port=9222")
 
-        //chromeOptions.setChromeBinaryPath('/opt/chrome/972765/chrome');
+        chromeOptions.setChromeBinaryPath('/opt/chrome/972765/chrome');
         chromeOptions.setChromeLogFile('/var/log');
         //chromeOptions.addArguments(defaultChromeFlags);
 
@@ -48,8 +57,24 @@ class Webscrapper {
 
     }
 
-    async getEmailList(webUrl) {
+    async getEmailList(webUrl, serviceID) {
         try {
+
+           
+            const config = { 
+                logGroupName: 'RvPixie', 
+                local: false, 		// Optional. If set to true, no LogStream will be created.
+                accessKeyId: process.env.aws_access_key_id,
+                secretAccessKey: process.env.aws_secret_access_key,
+                region: process.env.region
+
+            }
+            this.logStreamName =  `ServiceID${serviceID}`
+            await createLogStream(this.logStreamName, config);
+            
+            config.logStreamName = this.logStreamName;
+            this.logger = new Logger(config)
+
 
             var domainurl = new URL(webUrl);
             this.currentDomain = domainurl.host;
@@ -59,8 +84,10 @@ class Webscrapper {
             return this.emailAddressList;
         }
         catch (exc) {
+            this.logger.log({ category: 'critical', details: `Exception while parsing the url ${webUrl} with exception ${exc.message}` })
             console.error(exc.message, exc);
             return this.emailAddressList;
+
         }
 
     }
@@ -74,9 +101,9 @@ class Webscrapper {
             return false;
         }
         if (url.host.includes(this.currentDomain))
-            return false;
-
-        return url.protocol === "http:" || url.protocol === "https:";
+            return true;
+        return false;
+        //return url.protocol === "http:" || url.protocol === "https:";
     }
 
     async CrawlWeb(webUrl, depth) {
@@ -85,6 +112,7 @@ class Webscrapper {
             var driver = builder.build();
             try {
                 console.log(`Crawling url ${webUrl}`)
+                this.logger.log({ category: 'info', details: `Crawling url ${webUrl}` });
                 if (this.visitedLinks.includes(webUrl) == true)
                     return;
                 this.visitedLinks.push(webUrl);
@@ -125,9 +153,11 @@ class Webscrapper {
             }
             catch (exc) {
                 console.log(`Exception while crawling ${webUrl} with ${exc.message}`);
+                this.logger.log({ category: 'critical', details: `Exception while crawling ${webUrl} with ${exc.message}` })
             }
 
             console.log(`Completed crawling url ${webUrl}`)
+            this.logger.log({ category: 'info', details: `Completed crawling url ${webUrl}` });
             driver.close();
             driver.quit();
             //return;
@@ -137,6 +167,7 @@ class Webscrapper {
         }
         catch (exc) {
             console.log(`Outer Exception while crawling ${webUrl} with ${exc.message}`);
+            this.logger.log({ category: 'critical', details: `Outer Exception while crawling ${webUrl} with ${exc.message}` })
         }
 
         return;

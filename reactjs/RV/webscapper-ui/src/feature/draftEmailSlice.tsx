@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import CrawlerRequest from "../model/requestPayload"
+import {CrawlerRequest }from "../model/requestPayload"
 import { CrawlerResponse, CrawlerStatusResponse } from "../model/responsePayload"
 import { invokeGetStatus, invokeWebCrawler ,invokeGetDraftEmail} from "../services/crawlerService"
 

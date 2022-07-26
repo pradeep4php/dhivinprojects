@@ -22,7 +22,7 @@ export const getExistingEmail = createAsyncThunk<
     'email/existingEmail',
     async (payload: number, thunkAPI) => {
         const response = await invokeGetExistingEmail(payload);
-        return response.status;
+        return response.existingEmail;
     }
 )
 
@@ -39,7 +39,8 @@ export const emailSlice = createSlice({
         // Add reducers for additional action types here, and handle loading state as needed
         builder.addCase(getExistingEmail.fulfilled, (state, action) => {
             // Add user to the state array
-            state.emailaddress = [...action.payload];
+            if(Array.isArray(action.payload))
+                state.emailaddress = [...action.payload];
         })
            
     },
