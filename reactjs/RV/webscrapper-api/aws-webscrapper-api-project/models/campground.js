@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'CampGround',
+    freezeTableName: true
+
+
   });
   return CampGround;
 };
