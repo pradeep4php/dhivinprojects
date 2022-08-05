@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { invokeGetExistingEmail } from "../services/crawlerService";
+import { DeleteEmailRequest } from "../model/requestPayload";
+import { invokeDeleteEmail, invokeGetExistingEmail } from "../services/crawlerService";
 
 export interface EmailState {
     emailaddress : string[]
@@ -26,6 +27,23 @@ export const getExistingEmail = createAsyncThunk<
     }
 )
 
+
+export const deleteExistingEmail = createAsyncThunk<
+    // Return type of the payload creator
+    string,
+    // First argument to the payload creator
+    DeleteEmailRequest,
+    {
+
+    }
+>(
+    'email/deleteEmail',
+    async (payload: DeleteEmailRequest, thunkAPI) => {
+        const response = await invokeDeleteEmail(payload);
+        return payload.email;
+    }
+)
+
 export const emailSlice = createSlice({
     name: 'email',
     initialState,
@@ -41,6 +59,12 @@ export const emailSlice = createSlice({
             // Add user to the state array
             if(Array.isArray(action.payload))
                 state.emailaddress = [...action.payload];
+        }).addCase(deleteExistingEmail.fulfilled, (state, action) => {
+            // Add user to the state array
+                var emailTempList = [...state.emailaddress];
+                var removeIndex = emailTempList.indexOf(action.payload);
+                emailTempList.splice(removeIndex, 1);
+                state.emailaddress = [...emailTempList];
         })
            
     },

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { startWebCrawler, getStatus, currentServiceId, progressStatus, campGroundEmails, getDraftEmail, reset } from '../../feature/draftEmailSlice';
 import { searchCampGround, currentCampGround, addEmailAddress } from '../../feature/campGroundSlice';
-import { getExistingEmail, existingCampgroundEmail } from '../../feature/emailSlice'
+import { getExistingEmail, existingCampgroundEmail, deleteExistingEmail } from '../../feature/emailSlice'
 import TextField from '@mui/material/TextField';
 import { CampGroundEmailRequest } from "../../model/requestPayload"
 import './EmailScrapView.css';
@@ -98,7 +98,9 @@ export default function EmailScrapView() {
     let rootHost = currentDomain.hostname.replace("www.","");
     for (var e of currentEmailList) {
       const address = e.split('@').pop();
-      if (rootHost === address)
+      if(existingEmail.includes(e))
+        continue;
+      else if (rootHost === address)
         domainEmail.push(e);
       else
         nonDomainEmail.push(e);
@@ -106,7 +108,7 @@ export default function EmailScrapView() {
     }
     setNewEmails([...domainEmail]);
     setValidateEmails([...nonDomainEmail])
-  }, [currentEmailList, webUrl])
+  }, [currentEmailList, webUrl,existingEmail])
 
   const isSpinning = () => {
     return !(status === "" || status === "complete");
@@ -170,6 +172,21 @@ export default function EmailScrapView() {
 
   }
 
+  const onDeleteExistingEmail = (email) => {
+    if(!campGround || campGround.id == 0)
+    {
+      alert("Select a campground to delete email");
+      return;
+    }
+    dispatch(deleteExistingEmail({
+      email,
+      campgroundid : campGround.id 
+    }))
+
+  }
+
+  
+
 
   return <>
     <SearchAppBar onChange={onSearchTextChange}></SearchAppBar>
@@ -198,11 +215,13 @@ export default function EmailScrapView() {
                 <Box sx={{ p: 2, display: 'flex' }}>
                   <Avatar variant="rounded" src="https://img.icons8.com/ios-filled/50/000000/rv-campground.png" />
                   <Stack spacing={0.5}>
-                    <Typography fontWeight={700}>{campGround.name}</Typography>
-
+                    <Typography fontWeight={700}>{campGround.name}
+                    
+                    </Typography>
+                    {campGround.website}
                     <Typography variant="body2" color="text.secondary">
                       <img src="https://img.icons8.com/plumpy/24/1A1A1A/marker.png" />
-                      Scranton, PA
+                      {campGround.city},{campGround.country}
                     </Typography>
                   </Stack>
 
@@ -241,7 +260,7 @@ export default function EmailScrapView() {
           {
             existingEmail && existingEmail.map(function (key) {
               return <div className="row" id="emailRow"><div className='col-md-10'>{key} </div><div className='col-md-1 '>
-                <a><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
+                <a onClick={() => onDeleteExistingEmail(key)}><img src="https://img.icons8.com/material-rounded/24/000000/filled-trash.png" /></a>
               </div></div>
             })
           }

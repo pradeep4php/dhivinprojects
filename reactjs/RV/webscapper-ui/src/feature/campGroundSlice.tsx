@@ -8,14 +8,18 @@ export interface CamGroundState {
     id: number,
     name: string,
     website: string,
-    address : string
+    address : string,
+    city : string,
+    country : string
   }
   
   const initialState: CamGroundState = {
     id: 0,
     name:'',
     website: '', 
-    address:''
+    address:'',
+    city : '',
+    country : ''
   }
 
   
@@ -65,6 +69,8 @@ export interface CamGroundState {
           state.id = action.payload.id;
           state.website = action.payload.website;
           state.name = action.payload.name;
+          state.country = action.payload.country;
+          state.city = action.payload.city;
         })
        
       },

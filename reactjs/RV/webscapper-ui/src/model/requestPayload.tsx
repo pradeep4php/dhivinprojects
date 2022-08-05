@@ -8,3 +8,8 @@ export  interface CampGroundEmailRequest {
     donotemail : number,
     campgroundid : number,
 }
+
+export  interface DeleteEmailRequest {
+    email : string,
+    campgroundid : number,
+}

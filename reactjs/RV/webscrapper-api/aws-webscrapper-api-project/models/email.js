@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Email.init({
-    email: DataTypes.TEXT,
+    email: {
+      type: DataTypes.TEXT,
+      primaryKey: true 
+    },
     campgroundid: {
       type: DataTypes.INTEGER,
       references : {

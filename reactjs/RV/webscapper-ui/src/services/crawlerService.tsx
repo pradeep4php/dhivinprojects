@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import env from "react-dotenv";
-import {CrawlerRequest, CampGroundEmailRequest} from "../model/requestPayload";
+import {CrawlerRequest, CampGroundEmailRequest, DeleteEmailRequest} from "../model/requestPayload";
 import  { CrawlerResponse, CrawlerStatusResponse, DraftEmailResponse, ExistingEmailResponse } from "../model/responsePayload";
 
 
@@ -31,6 +31,11 @@ export async function invokeGetDraftEmail(id:number) {
 
 
 export async function invokeGetExistingEmail(id:number) {
-    var {data} = await axios.get<AxiosResponse<ExistingEmailResponse>>(`${env.apiUrl}/existemail/${id}`);
+    var {data} = await axios.get<AxiosResponse<ExistingEmailResponse>>(`${env.apiUrl}existemail/${id}`);
+    return data as any;
+}
+
+export async function invokeDeleteEmail(req: DeleteEmailRequest) {
+    var {data} = await axios.get<AxiosResponse<string>>(`${env.apiUrl}email/${req.campgroundid}/${req.email}`);
     return data as any;
 }
